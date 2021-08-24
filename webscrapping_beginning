@@ -1,0 +1,23 @@
+from bs4 import BeautifulSoup
+import requests
+
+url="https://emlak.az/"
+
+# Make a GET request to fetch the raw HTML content
+html_content = requests.get(url).text
+
+# Parse the html content
+soup = BeautifulSoup(html_content, "lxml")
+#print(soup)
+
+#gdp_table = soup.find("div", attrs={"class": "ticket-item"})
+
+gdp_table_data = soup.find_all("div",attrs={"class": "ticket-item"} )  # contains 2 rows
+
+# Get all the headings of Lists
+#  headings = []
+#for td in gdp_table_data[0].find_all("td"):
+    # remove any newlines and extra spaces from left and right
+#   headings.append(td.b.text.replace('\n', ' ').strip())
+
+print(gdp_table_data)
