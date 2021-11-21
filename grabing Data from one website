@@ -1,0 +1,81 @@
+from bs4 import BeautifulSoup
+import requests
+url="https://emlak.az/"
+html_content = requests.get(url).text
+soup = BeautifulSoup(html_content, "lxml")
+links=[]
+number=1
+for div in  soup.find_all("a", href=True ):
+    if str(div.get('href')).find("html")>0:
+        number+=1
+        links.append(div.get('href'))
+#print(links)
+print(links[121]) 
+print(len(links))
+
+base_link='https://emlak.az'
+appendix='/762813-satilir-3-otaqli-88-m2-yeni-tikili-turkiye.html'
+
+import requests
+import pandas as pd
+import matplotlib as plt 
+import seaborn as sns
+import numpy as np
+
+Data=[]
+def data_gatherer(link, appendix, Data):
+    description=''
+    property_type=''
+    area=''
+    number_of_rooms=''
+    level=''
+    number_of_levels=''
+    remont=''
+    document_typ=''
+    url=base_link+appendix;
+    html_content = requests.get(url).text
+    soup = BeautifulSoup(html_content, "lxml")
+    for div in  soup.find_all("div",attrs={"class": "desc"} ):
+        #print(div)
+        description=div.find("p").text
+    for dl_data in  soup.find_all("dl",attrs={"class": "technical-characteristics"} ):
+        for dlitem in dl_data.find_all("dd"):
+            
+            if dlitem.find('span').text=='Əmlakın növü':
+                [tag.extract() for tag in dlitem.find(class_="label")]
+                property_type=dlitem.text
+                
+            if dlitem.find('span').text=='Sahə':
+                [tag.extract() for tag in dlitem.find(class_="label")]
+                area=dlitem.text
+                
+            if dlitem.find('span').text=='Otaqların sayı':
+                [tag.extract() for tag in dlitem.find(class_="label")]
+                number_of_rooms=dlitem.text
+                
+            if dlitem.find('span').text=='Yerləşdiyi mərtəbə':
+                [tag.extract() for tag in dlitem.find(class_="label")]
+                level=dlitem.text
+                
+            if dlitem.find('span').text=='Mərtəbə sayı':
+                [tag.extract() for tag in dlitem.find(class_="label")]
+                number_of_levels=dlitem.text
+                
+            if dlitem.find('span').text=='Təmiri':
+                [tag.extract() for tag in dlitem.find(class_="label")]
+                remont=dlitem.text
+                
+            if dlitem.find('span').text=='Sənədin tipi':
+                [tag.extract() for tag in dlitem.find(class_="label")]
+                document_typ=dlitem.text
+    Data.append((description, property_type, area, number_of_rooms,  level, number_of_levels,remont,document_typ))
+
+i=0
+while i <len(links):
+    data_gatherer(base_link,links[i],Data)
+    i=i+1
+    
+
+arr=np.array(Data)
+arr=arr.reshape(len(Data),8)
+df=pd.DataFrame(arr)   
